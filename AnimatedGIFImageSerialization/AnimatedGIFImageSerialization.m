@@ -205,6 +205,7 @@ static inline void animated_gif_swizzleSelector(Class class, SEL originalSelecto
             animated_gif_swizzleSelector(self, @selector(initWithContentsOfFile:), @selector(animated_gif_initWithContentsOfFile:));
             animated_gif_swizzleSelector(self, @selector(initWithData:), @selector(animated_gif_initWithData:));
             animated_gif_swizzleSelector(self, @selector(initWithData:scale:), @selector(animated_gif_initWithData:scale:));
+            animated_gif_swizzleSelector(object_getClass((id)self), @selector(animatedImageNamed:duration:), @selector(animated_gif_imageNamed:duration:));
         }
     });
 }
@@ -226,6 +227,26 @@ static inline void animated_gif_swizzleSelector(Class class, SEL originalSelecto
 
     return [self animated_gif_imageNamed:name];
 }
+
++ (UIImage *)animated_gif_imageNamed:(NSString *)name duration:(NSTimeInterval)duration __attribute__((objc_method_family(new))) {
+    NSString *path = [[NSBundle mainBundle] pathForResource:[name stringByDeletingPathExtension] ofType:[name pathExtension]];
+
+    float scale = 1.0f;
+    if (!path) {
+        path = [[NSBundle mainBundle] pathForResource:[[name stringByDeletingPathExtension] stringByAppendingString:@"@2x"] ofType:[name pathExtension]];
+        scale = 2.0f;
+    }
+    
+    if (path) {
+        NSData *data = [NSData dataWithContentsOfFile:path];
+        if (AnimatedGifDataIsValid(data)) {
+            return UIImageWithAnimatedGIFData(data, scale, duration, nil);
+        }
+    }
+    
+    return [self animated_gif_imageNamed:name duration:duration];
+}
+
 
 + (UIImage *)animated_gif_imageWithContentsOfFile:(NSString *)path __attribute__((objc_method_family(new))) {
     if (path) {
