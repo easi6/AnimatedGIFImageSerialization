@@ -48,6 +48,8 @@ extern __attribute__((overloadable)) NSData * UIImageAnimatedGIFRepresentation(U
  */
 extern __attribute__((overloadable)) NSData * UIImageAnimatedGIFRepresentation(UIImage *image, NSTimeInterval duration, NSUInteger loopCount, NSError * __autoreleasing *error);
 
+extern __attribute__((overloadable)) BOOL AnimatedGifDataIsValid(NSData *data);
+
 #pragma mark -
 
 /**
